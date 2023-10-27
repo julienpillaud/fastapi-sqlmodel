@@ -1,0 +1,48 @@
+[tool.poetry]
+name = "fastapiproject"
+version = "0.1.0"
+description = ""
+authors = ["Julien Pillaud <julien.pillaud@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.104.0"
+uvicorn = "^0.23.2"
+sqlmodel = "^0.0.10"
+pytest = "^7.4.3"
+coverage = "^7.3.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.10.1"
+ruff = "^0.1.2"
+mypy = "^1.6.1"
+pytest = "^7.4.3"
+httpx = "^0.25.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.coverage.run]
+source = ["app"]
+
+[tool.mypy]
+strict = true
+no_implicit_reexport = false
+
+[tool.ruff]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long, handled by black
+]
+
+[tool.ruff.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends"]
