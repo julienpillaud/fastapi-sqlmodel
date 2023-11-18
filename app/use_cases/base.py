@@ -1,4 +1,4 @@
-from typing import Generic, Type, TypeVar
+from typing import Generic, Sequence, Type, TypeVar
 
 from sqlmodel import Session, SQLModel, select
 
@@ -23,7 +23,7 @@ class CRUDBase(Generic[SchemaType, CreateSchemaType, UpdateSchemaType]):
 
     def get_multi(
         self, session: Session, offset: int = 0, limit: int = 0
-    ) -> list[SchemaType]:
+    ) -> Sequence[SchemaType]:
         return session.exec(select(self.model).offset(offset).limit(limit)).all()
 
     @staticmethod
