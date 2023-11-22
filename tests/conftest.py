@@ -7,6 +7,7 @@ from sqlmodel.pool import StaticPool
 
 from app.dependencies import get_session
 from app.main import app
+from tests.utils.users import get_authentication_headers
 
 
 @pytest.fixture(name="session")
@@ -29,3 +30,13 @@ def client_fixture(session: Session) -> Iterator[TestClient]:
     client = TestClient(app)
     yield client
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def superuser_headers(session: Session, client: TestClient) -> dict[str, str]:
+    return get_authentication_headers(session=session, client=client, is_superuser=True)
+
+
+@pytest.fixture
+def normal_user_headers(session: Session, client: TestClient) -> dict[str, str]:
+    return get_authentication_headers(session=session, client=client)

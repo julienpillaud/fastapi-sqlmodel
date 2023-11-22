@@ -1,5 +1,6 @@
-from typing import Generic, Sequence, Type, TypeVar
+from typing import Any, Generic, Sequence, Type, TypeVar
 
+from fastapi.encoders import jsonable_encoder
 from sqlmodel import Session, SQLModel, select
 
 SchemaType = TypeVar("SchemaType", bound=SQLModel)
@@ -26,13 +27,21 @@ class CRUDBase(Generic[SchemaType, CreateSchemaType, UpdateSchemaType]):
     ) -> Sequence[SchemaType]:
         return session.exec(select(self.model).offset(offset).limit(limit)).all()
 
-    @staticmethod
     def update(
-        session: Session, db_obj: SchemaType, obj_in: UpdateSchemaType
+        self,
+        session: Session,
+        db_obj: SchemaType,
+        obj_in: UpdateSchemaType | dict[str, Any],
     ) -> SchemaType:
-        obj_data = obj_in.dict(exclude_unset=True)
-        for key, value in obj_data.items():
-            setattr(db_obj, key, value)
+        if isinstance(obj_in, dict):
+            update_data = obj_in
+        else:
+            update_data = obj_in.dict(exclude_unset=True)
+
+        for field in jsonable_encoder(db_obj):
+            if field in update_data:
+                setattr(db_obj, field, update_data[field])
+
         session.add(db_obj)
         session.commit()
         session.refresh(db_obj)
