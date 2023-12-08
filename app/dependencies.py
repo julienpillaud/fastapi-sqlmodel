@@ -33,7 +33,7 @@ def get_current_user(
 
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
-        token_data = TokenData.parse_obj(payload)
+        token_data = TokenData.model_validate(payload)
     except (JWTError, ValidationError):
         raise credentials_exception from JWTError
 
@@ -44,7 +44,7 @@ def get_current_user(
 
 
 def get_current_active_superuser(
-    current_user: Annotated[User, Depends(get_current_user)]
+    current_user: Annotated[User, Depends(get_current_user)],
 ) -> User:
     if not current_user.is_superuser:
         raise HTTPException(

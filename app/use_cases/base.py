@@ -13,7 +13,7 @@ class CRUDBase(Generic[SchemaType, CreateSchemaType, UpdateSchemaType]):
         self.model = model
 
     def create(self, session: Session, obj_in: CreateSchemaType) -> SchemaType:
-        db_obj = self.model.from_orm(obj_in)
+        db_obj = self.model.model_validate(obj_in)
         session.add(db_obj)
         session.commit()
         session.refresh(db_obj)
@@ -36,7 +36,7 @@ class CRUDBase(Generic[SchemaType, CreateSchemaType, UpdateSchemaType]):
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
-            update_data = obj_in.dict(exclude_unset=True)
+            update_data = obj_in.model_dump(exclude_unset=True)
 
         for field in jsonable_encoder(db_obj):
             if field in update_data:
